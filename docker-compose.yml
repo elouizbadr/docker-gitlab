@@ -22,13 +22,13 @@ services:
 
   gitlab:
     restart: always
-    image: sameersbn/gitlab:9.0.2
+    image: elouizbadr/gitlab:latest
     depends_on:
     - redis
     - postgresql
     ports:
-    - "10080:80"
-    - "10022:22"
+    - "8080:80"
+    - "2222:22"
     volumes:
     - /srv/docker/gitlab/gitlab:/home/git/data:Z
     environment:
@@ -44,39 +44,46 @@ services:
     - REDIS_HOST=redis
     - REDIS_PORT=6379
 
-    - TZ=Asia/Kolkata
-    - GITLAB_TIMEZONE=Kolkata
+    - TZ=Africa/Casablance
+    - GITLAB_TIMEZONE=Casablanca
 
     - GITLAB_HTTPS=false
     - SSL_SELF_SIGNED=false
 
     - GITLAB_HOST=localhost
-    - GITLAB_PORT=10080
-    - GITLAB_SSH_PORT=10022
+    - GITLAB_PORT=8080
+    - GITLAB_SSH_PORT=2222
     - GITLAB_RELATIVE_URL_ROOT=
-    - GITLAB_SECRETS_DB_KEY_BASE=long-and-random-alphanumeric-string
-    - GITLAB_SECRETS_SECRET_KEY_BASE=long-and-random-alphanumeric-string
-    - GITLAB_SECRETS_OTP_KEY_BASE=long-and-random-alphanumeric-string
+    - GITLAB_SECRETS_DB_KEY_BASE=ohThiu3iNuojohy1Iew4Hai4aeL0dai8Uboobo1ucheiw7PiceGai1reohW8eik4
+    - GITLAB_SECRETS_SECRET_KEY_BASE=ohThiu3iNuojohy1Iew4Hai4aeL0dai8Uboobo1ucheiw7PiceGai1reohW8eik4
+    - GITLAB_SECRETS_OTP_KEY_BASE=ohThiu3iNuojohy1Iew4Hai4aeL0dai8Uboobo1ucheiw7PiceGai1reohW8eik4
 
-    - GITLAB_ROOT_PASSWORD=
-    - GITLAB_ROOT_EMAIL=
+    - GITLAB_ROOT_PASSWORD=P@ssw0rd
+    - GITLAB_ROOT_EMAIL=elouiz.badr@gmail.com
 
     - GITLAB_NOTIFY_ON_BROKEN_BUILDS=true
-    - GITLAB_NOTIFY_PUSHER=false
+    - GITLAB_NOTIFY_PUSHER=true
 
-    - GITLAB_EMAIL=notifications@example.com
-    - GITLAB_EMAIL_REPLY_TO=noreply@example.com
-    - GITLAB_INCOMING_EMAIL_ADDRESS=reply@example.com
+    - GITLAB_EMAIL=notifications.gitlab.fy@gmail.com
+    - GITLAB_EMAIL_REPLY_TO=elouiz.badr@gmail.com
+    - GITLAB_INCOMING_EMAIL_ADDRESS=notifications.gitlab.fy@gmail.com
 
-    - GITLAB_BACKUP_SCHEDULE=daily
-    - GITLAB_BACKUP_TIME=01:00
+    - GITLAB_BACKUP_SCHEDULE=hourly
+    - GITLAB_BACKUP_TIME=01:35
+    - GITLAB_BACKUP_EXPIRY=604800
+   
+    - GITLAB_RSYNC=true
+    - GITLAB_RSYNC_SSH_REMOTEKEY='cat remote_key.txt'
+    - GITLAB_RSYNC_DEST=albodor@10.168.0.127:/shared_backups
+    - GITLAB_RSYNC_SCHEDULE=hourly
+    - GITLAB_RSYNC_TIME=01:40
 
-    - SMTP_ENABLED=false
-    - SMTP_DOMAIN=www.example.com
+    - SMTP_ENABLED=true
+    - SMTP_DOMAIN=smtp.gmail.com
     - SMTP_HOST=smtp.gmail.com
     - SMTP_PORT=587
-    - SMTP_USER=mailer@example.com
-    - SMTP_PASS=password
+    - SMTP_USER=notifications.gitlab.fy@gmail.com
+    - SMTP_PASS=notifications2017
     - SMTP_STARTTLS=true
     - SMTP_AUTHENTICATION=login
 

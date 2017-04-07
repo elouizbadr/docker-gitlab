@@ -717,7 +717,7 @@ gitlab_configure_sidekiq() {
 
 gitlab_configure_backups_schedule() {
   case ${GITLAB_BACKUP_SCHEDULE} in
-    daily|weekly|monthly)
+    hourly|daily|weekly|monthly)
       if [[ ! $(crontab -u ${GITLAB_USER} -l >/tmp/cron.${GITLAB_USER} 2>/dev/null) || \
             ! $(grep -q 'bundle exec rake gitlab:backup:create' /tmp/cron.${GITLAB_USER}) ]]; then
         echo "Configuring gitlab::backups::schedule..."
@@ -726,11 +726,37 @@ gitlab_configure_backups_schedule() {
         month=*
         day_of_week=*
         case ${GITLAB_BACKUP_SCHEDULE} in
+          hourly) hour="*/$hour";;
           daily) ;;
           weekly) day_of_week=0 ;;
           monthly) day_of_month=01 ;;
         esac
         echo "$min $hour $day_of_month $month $day_of_week /bin/bash -l -c 'cd ${GITLAB_INSTALL_DIR} && bundle exec rake gitlab:backup:create SKIP=${GITLAB_BACKUP_SKIP} RAILS_ENV=${RAILS_ENV}'" >> /tmp/cron.${GITLAB_USER}
+        crontab -u ${GITLAB_USER} /tmp/cron.${GITLAB_USER}
+      fi
+      rm -rf /tmp/cron.${GITLAB_USER}
+      ;;
+  esac
+}
+
+## RSYNC
+gitlab_configure_rsync() {
+  case ${GITLAB_RSYNC_SCHEDULE} in
+    hourly|daily|weekly|monthly)
+      if [[ ! $(crontab -u ${GITLAB_USER} -l >/tmp/cron.${GITLAB_USER} 2>/dev/null) || \
+            ! $(grep -q 'rsync' /tmp/cron.${GITLAB_USER}) ]]; then
+        echo "Configuring gitlab::rsync..."
+        read hour min <<< ${GITLAB_RSYNC_TIME//[:]/ }
+        day_of_month=*
+        month=*
+        day_of_week=*
+        case ${GITLAB_RSYNC_SCHEDULE} in
+          hourly) hour="*/$hour";;
+          daily) ;;
+          weekly) day_of_week=0 ;;
+          monthly) day_of_month=01 ;;
+        esac
+        echo "$min $hour $day_of_month $month $day_of_week /bin/bash -l -c 'rsync -avzh ${GITLAB_BACKUP_DIR}/  ${GITLAB_RSYNC_DEST}/'" >> /tmp/cron.${GITLAB_USER}
         crontab -u ${GITLAB_USER} /tmp/cron.${GITLAB_USER}
       fi
       rm -rf /tmp/cron.${GITLAB_USER}
@@ -1367,6 +1393,7 @@ configure_gitlab() {
   gitlab_configure_gravatar
   gitlab_configure_analytics
   gitlab_configure_backups
+  gitlab_configure_rsync
   gitlab_configure_registry
   gitlab_configure_pages
 
