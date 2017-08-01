@@ -68,7 +68,7 @@ services:
 
   registry:
     restart: always
-    image: registry:2.4.1
+    image: registry:2.6
     ports:
     - "5000:5000"
     volumes:

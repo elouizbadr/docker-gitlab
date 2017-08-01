@@ -1,22 +1,25 @@
-FROM sameersbn/ubuntu:14.04.20170228
+FROM sameersbn/ubuntu:14.04.20170724
 MAINTAINER sameer@damagehead.com
 
-ENV GITLAB_VERSION=9.1.0 \
+ENV GITLAB_VERSION=9.4.1 \
     RUBY_VERSION=2.3 \
-    GOLANG_VERSION=1.6.3 \
-    GITLAB_SHELL_VERSION=5.0.2 \
-    GITLAB_WORKHORSE_VERSION=1.4.3 \
-    GITLAB_PAGES_VERSION=0.4.0 \
+    GOLANG_VERSION=1.8.3 \
+    GITLAB_SHELL_VERSION=5.3.1 \
+    GITLAB_WORKHORSE_VERSION=2.3.0 \
+    GITLAB_PAGES_VERSION=0.5.0 \
+    GITALY_SERVER_VERSION=0.21.2 \
     GITLAB_USER="git" \
     GITLAB_HOME="/home/git" \
     GITLAB_LOG_DIR="/var/log/gitlab" \
     GITLAB_CACHE_DIR="/etc/docker-gitlab" \
-    RAILS_ENV=production
+    RAILS_ENV=production \
+    NODE_ENV=production
 
 ENV GITLAB_INSTALL_DIR="${GITLAB_HOME}/gitlab" \
     GITLAB_SHELL_INSTALL_DIR="${GITLAB_HOME}/gitlab-shell" \
     GITLAB_WORKHORSE_INSTALL_DIR="${GITLAB_HOME}/gitlab-workhorse" \
     GITLAB_PAGES_INSTALL_DIR="${GITLAB_HOME}/gitlab-pages" \
+    GITLAB_GITALY_INSTALL_DIR="${GITLAB_HOME}/gitaly" \
     GITLAB_DATA_DIR="${GITLAB_HOME}/data" \
     GITLAB_BUILD_DIR="${GITLAB_CACHE_DIR}/build" \
     GITLAB_RUNTIME_DIR="${GITLAB_CACHE_DIR}/runtime"
@@ -40,7 +43,6 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv E1DD270288B4E60
       libmysqlclient18 libpq5 zlib1g libyaml-0-2 libssl1.0.0 \
       libgdbm3 libreadline6 libncurses5 libffi6 \
       libxml2 libxslt1.1 libcurl3 libicu52 \
-      rsync nano expect \
  && update-locale LANG=C.UTF-8 LC_MESSAGES=POSIX \
  && locale-gen en_US.UTF-8 \
  && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales \

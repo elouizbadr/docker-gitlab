@@ -7,118 +7,41 @@ services:
     command:
     - --loglevel warning
     volumes:
-    - /srv/docker/gitlab/redis:/var/lib/redis:Z
+    - ./gitlab/redis:/var/lib/redis:Z
+    env_file: settings/redis.env
 
   postgresql:
     restart: always
     image: sameersbn/postgresql:9.6-2
     volumes:
-    - /srv/docker/gitlab/postgresql:/var/lib/postgresql:Z
-    environment:
-    - DB_USER=gitlab
-    - DB_PASS=password
-    - DB_NAME=gitlabhq_production
-    - DB_EXTENSION=pg_trgm
+    - ./gitlab/postgresql:/var/lib/postgresql:Z
+    env_file: settings/postgresql.env
 
   gitlab:
     restart: always
-    image: albodor/docker-gitlab:latest
+    image: sameersbn/gitlab:9.4.1
     depends_on:
     - redis
     - postgresql
     ports:
-    - "8080:80"
+    - "8888:80"
     - "2222:22"
+#    external_links:
+#    - "registry:registry.example.com"
     volumes:
-    - /srv/docker/gitlab/gitlab:/home/git/data:Z
-    env_file : settings.env
-    environment:
-    - DEBUG=false
+    - ./gitlab/gitlab:/home/git/data:Z
+    - ./logs:/var/log/gitlab
+    - ./certs:/certs
+    env_file : settings/gitlab.env
 
-    - DB_ADAPTER=postgresql
-    - DB_HOST=postgresql
-    - DB_PORT=5432
-    - DB_USER=gitlab
-    - DB_PASS=password
-    - DB_NAME=gitlabhq_production
-
-    - REDIS_HOST=redis
-    - REDIS_PORT=6379
-
-    - TZ=Africa/Casablance
-    - GITLAB_TIMEZONE=Casablanca
-
-    - GITLAB_HTTPS=false
-    - SSL_SELF_SIGNED=false
-
-    - GITLAB_NOTIFY_ON_BROKEN_BUILDS=true
-    - GITLAB_NOTIFY_PUSHER=true
-
-    - IMAP_ENABLED=false
-    - IMAP_HOST=imap.gmail.com
-    - IMAP_PORT=993
-    - IMAP_USER=mailer@example.com
-    - IMAP_PASS=password
-    - IMAP_SSL=true
-    - IMAP_STARTTLS=false
-
-    - OAUTH_ENABLED=false
-    - OAUTH_AUTO_SIGN_IN_WITH_PROVIDER=
-    - OAUTH_ALLOW_SSO=
-    - OAUTH_BLOCK_AUTO_CREATED_USERS=true
-    - OAUTH_AUTO_LINK_LDAP_USER=false
-    - OAUTH_AUTO_LINK_SAML_USER=false
-    - OAUTH_EXTERNAL_PROVIDERS=
-
-    - OAUTH_CAS3_LABEL=cas3
-    - OAUTH_CAS3_SERVER=
-    - OAUTH_CAS3_DISABLE_SSL_VERIFICATION=false
-    - OAUTH_CAS3_LOGIN_URL=/cas/login
-    - OAUTH_CAS3_VALIDATE_URL=/cas/p3/serviceValidate
-    - OAUTH_CAS3_LOGOUT_URL=/cas/logout
-
-    - OAUTH_GOOGLE_API_KEY=
-    - OAUTH_GOOGLE_APP_SECRET=
-    - OAUTH_GOOGLE_RESTRICT_DOMAIN=
-
-    - OAUTH_FACEBOOK_API_KEY=
-    - OAUTH_FACEBOOK_APP_SECRET=
-
-    - OAUTH_TWITTER_API_KEY=
-    - OAUTH_TWITTER_APP_SECRET=
-
-    - OAUTH_GITHUB_API_KEY=
-    - OAUTH_GITHUB_APP_SECRET=
-    - OAUTH_GITHUB_URL=
-    - OAUTH_GITHUB_VERIFY_SSL=
-
-    - OAUTH_GITLAB_API_KEY=
-    - OAUTH_GITLAB_APP_SECRET=
-
-    - OAUTH_BITBUCKET_API_KEY=
-    - OAUTH_BITBUCKET_APP_SECRET=
-
-    - OAUTH_SAML_ASSERTION_CONSUMER_SERVICE_URL=
-    - OAUTH_SAML_IDP_CERT_FINGERPRINT=
-    - OAUTH_SAML_IDP_SSO_TARGET_URL=
-    - OAUTH_SAML_ISSUER=
-    - OAUTH_SAML_LABEL="Our SAML Provider"
-    - OAUTH_SAML_NAME_IDENTIFIER_FORMAT=urn:oasis:names:tc:SAML:2.0:nameid-format:transient
-    - OAUTH_SAML_GROUPS_ATTRIBUTE=
-    - OAUTH_SAML_EXTERNAL_GROUPS=
-    - OAUTH_SAML_ATTRIBUTE_STATEMENTS_EMAIL=
-    - OAUTH_SAML_ATTRIBUTE_STATEMENTS_NAME=
-    - OAUTH_SAML_ATTRIBUTE_STATEMENTS_FIRST_NAME=
-    - OAUTH_SAML_ATTRIBUTE_STATEMENTS_LAST_NAME=
-
-    - OAUTH_CROWD_SERVER_URL=
-    - OAUTH_CROWD_APP_NAME=
-    - OAUTH_CROWD_APP_PASSWORD=
-
-    - OAUTH_AUTH0_CLIENT_ID=
-    - OAUTH_AUTH0_CLIENT_SECRET=
-    - OAUTH_AUTH0_DOMAIN=
-
-    - OAUTH_AZURE_API_KEY=
-    - OAUTH_AZURE_API_SECRET=
-    - OAUTH_AZURE_TENANT_ID=
+#  registry:
+#    restart: always
+#    image: registry:2.4.1
+#    ports:
+#    - "5000:5000"
+#    volumes:
+#    - ./gitlab/registry:/var/lib/registry
+#    - ./certs:/certs
+#    external_links:
+#    - "gitlab:gitlab.example.com"
+#    env_file : settings/registry.env
